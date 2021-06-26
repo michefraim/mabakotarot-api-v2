@@ -1,26 +1,30 @@
 import { Injectable } from '@nestjs/common';
-import { CreateApiDto } from './dto/create-api.dto';
-import { UpdateApiDto } from './dto/update-api.dto';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { Headline } from './headline.model';
 
 @Injectable()
 export class ApiService {
-  create(createApiDto: CreateApiDto) {
-    return 'This action adds a new api';
-  }
+  private headlines: Headline[] = [];
+  constructor(
+    @InjectModel('Headline') private readonly headlineModel: Model<Headline>,
+  ) {}
 
-  findAll() {
-    return `This action returns all api`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} api`;
-  }
-
-  update(id: number, updateApiDto: UpdateApiDto) {
-    return `This action updates a #${id} api`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} api`;
+  async getHeadlines(page: number, count: number, isSortAsc: boolean) {
+    try {
+      const response = await this.headlineModel
+        .find()
+        .sort([
+          ['date', isSortAsc ? 1 : -1],
+          ['site', 1],
+        ])
+        .skip(count * (page - 1))
+        .limit(count);
+      console.log('number of headlines fetched: ', response.length);
+      const headlines = { headlines: response };
+      return headlines;
+    } catch (err) {
+      console.log(err);
+    }
   }
 }

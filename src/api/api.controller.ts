@@ -1,4 +1,10 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Query,
+  ParseIntPipe,
+  ParseBoolPipe,
+} from '@nestjs/common';
 import { ApiService } from './api.service';
 
 @Controller('api')
@@ -7,10 +13,10 @@ export class ApiController {
 
   @Get('headlines')
   async getHeadlines(
-    @Query('page') page: number,
-    @Query('count') count: number,
-    @Query('isSortAsc') isSortAsc: boolean,
+    @Query('page', ParseIntPipe) page: number,
+    @Query('count', ParseIntPipe) count: number,
+    @Query('isSortAsc', ParseBoolPipe) isSortAsc: boolean,
   ) {
-    return this.apiService.getHeadlines(+page, +count, isSortAsc);
+    return this.apiService.getHeadlines(page, count, isSortAsc);
   }
 }
